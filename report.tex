@@ -91,12 +91,23 @@ We also train a paired encoder-decoder: the encoder is a linear map from activat
 \paragraph{Cross-sequence consistency.}
 To assess whether different sequences induce similar belief-state representations, we also train separate probes on individual sequences and compare them pairwise. For each layer, we compute the cosine similarity between per-sequence probe weight matrices, the first principal angle $\theta_1$ between the column spaces they span, and the cross-MSE ratio (the MSE when one sequence's probe is applied to another sequence's activations, divided by the self-evaluation MSE). We also compare the pooled probe to each per-sequence probe using the same metrics.
 
-\paragraph{Fern.}
+\paragraph{Fern and Leopard.}
 A concern with Mess3 is that the emission matrix defines a linear map from the belief state to the output token distribution. This means that a high-quality linear probe could in principle reflect a linear encoding of the model's current output probabilities rather than the belief state proper. In that case, the representation would not require any latent-state tracking beyond what is needed to produce the current output.
 
-The Fern process addresses this ambiguity. It has two output tokens and three hidden states, with an emission matrix that does not admit a left inverse, so the output distribution does not uniquely determine the belief state.
-If the model still encodes a three-dimensional belief state geometry for Fern, this provides stronger evidence that it tracks latent states rather than simply compressing its output distribution.
-\textit{TODO (Chirag): add Fern methodology details here.}
+The Fern process addresses this ambiguity. It has two output tokens and three hidden states, with an emission matrix that does not admit a left inverse, so the output distribution does not uniquely determine the belief state. Fern is parameterized by a single parameter $x \in [0, 1]$ that controls the coupling between states 1 and 2: the transition matrices interpolate between symmetric ($x = 0$) and maximally asymmetric ($x = 1$) configurations. We test $x \in \{0.4, 0.63\}$. If the model still encodes a three-dimensional belief state geometry for Fern, this provides stronger evidence that it tracks latent states rather than simply compressing its output distribution.
+
+We additionally test the Leopard process, another 3-state, 2-token HMM parameterized by $x \in [0, 1]$, with a sparser, quasi-deterministic transition structure (many zero entries). Leopard tests whether the model can track belief states for processes with sharply different mixing properties. We test $x \in \{0.15, 0.5\}$.
+
+\paragraph{Belief-state sweep.}
+To systematically assess how HMM structure affects belief-state encoding, we run a sweep across all three process families (Mess3, Fern, Leopard) and multiple parameterizations, totaling 8 configurations. For each configuration, we generate 50 sequences of length 1000 tokens (20 train, 30 test), extract residual stream activations at all 28 layers, train linear probes (ridge regression) to decode the 3D belief-state vector, and visualize the activation geometry via 2D PCA projections colored by belief state.
+
+\paragraph{Tuned lens sweep.}
+For each configuration in the belief-state sweep, we train two types of per-layer affine translators (tuned lenses):
+\begin{itemize}
+  \item \textbf{Model-target:} Trained to minimize $D_{\mathrm{KL}}(\mathbf{p}_{\mathrm{final}} \,\|\, \mathrm{softmax}(T_l(\mathbf{h}_l) \cdot W_{\mathrm{concept}} + \mathbf{b}_{\mathrm{concept}}))$, where $T_l$ is an identity-initialized affine transformation and $\mathbf{p}_{\mathrm{final}}$ is the model's final-layer output distribution over concept tokens.
+  \item \textbf{HMM-target:} Trained with the same architecture but targeting the HMM's observation probabilities (ground-truth next-token distribution given the belief state).
+\end{itemize}
+This yields four KL divergence metrics per layer: $D_{\mathrm{KL}}(\mathrm{HMM} \,\|\, \mathrm{tuned\_hmm})$, $D_{\mathrm{KL}}(\mathrm{model} \,\|\, \mathrm{tuned\_model})$, $D_{\mathrm{KL}}(\mathrm{HMM} \,\|\, \mathrm{tuned\_model})$, and $D_{\mathrm{KL}}(\mathrm{model} \,\|\, \mathrm{tuned\_hmm})$. By plotting these against the linear probe $R^2$ at each layer, we can disentangle how well each layer's activations encode the HMM belief state versus the model's own output distribution.
 
 \paragraph{Emergence.}
 To study how the belief state representation develops over the course of a sequence, we track the token position at which the probe's $R^2$ first crosses 0.9 at each layer, and compare this to the position at which the model's KL divergence converges. A negative lag (probe threshold reached before KL convergence) indicates that a given layer begins encoding the belief state before the model's output distribution has fully adapted.
@@ -210,8 +221,66 @@ Figure~\ref{fig:simplex} shows the belief states recovered by the encoder-decode
   \label{fig:simplex}
 \end{figure}
 
-\paragraph{Fern.}
-\textit{TODO (Chirag): add Fern results here.}
+\paragraph{Fern, Leopard, and belief-state sweep.}
+We extend the belief-state probing analysis across 8 HMM configurations spanning three process families (Mess3, Fern, Leopard) with varying parameters. Table~\ref{tab:sweep_r2} summarizes the peak linear probe performance.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Peak belief-state probe $R^2$ across HMM configurations, with the layer at which the minimum KL(HMM $\|$ HMM-target tuned lens) is achieved.}
+  \label{tab:sweep_r2}
+  \begin{tabular}{lcccc}
+    \hline
+    Config & Best $R^2$ layer & Best $R^2$ & Min KL(HMM $\|$ tuned\_hmm) & at layer \\
+    \hline
+    mess3 ($\alpha{=}0.6$, $x{=}0.15$) & 3 & 0.9998 & 0.000027 & 3 \\
+    mess3 ($\alpha{=}0.2$, $x{=}0.15$) & 3 & 0.9997 & ${\approx}0$ & 1 \\
+    mess3 ($\alpha{=}0.6$, $x{=}0.5$) & 4 & 0.9954 & 0.000107 & 3 \\
+    mess3 ($\alpha{=}0.2$, $x{=}0.5$) & 3 & 0.9928 & 0.000023 & 3 \\
+    fern ($x{=}0.63$) & 5 & 0.9928 & 0.000097 & 5 \\
+    fern ($x{=}0.4$) & 5 & 0.9757 & 0.000059 & 4 \\
+    leopard ($x{=}0.15$) & 7 & 0.5727 & 0.031580 & 7 \\
+    leopard ($x{=}0.5$) & 5 & 0.3337 & 0.009651 & 6 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+The Fern results provide the strongest evidence that the model tracks genuine latent structure: despite the non-injective emission matrix (2 tokens, 3 states), linear probes achieve $R^2 > 0.97$ at layers 3--5, and the HMM-target tuned lens achieves KL $< 0.0001$. The model encodes a full 3D belief-state geometry even though its output distribution is one-dimensional, ruling out the hypothesis that the representation merely compresses output probabilities.
+
+The Leopard process, by contrast, shows substantially weaker belief-state encoding ($R^2 \approx 0.33$--$0.57$). This is not simply a consequence of having two output tokens; Fern also has two tokens but achieves near-perfect $R^2$. The difference likely reflects Leopard's sparser, more deterministic transition structure, which may not align well with the model's inductive biases for in-context sequence prediction.
+
+Figure~\ref{fig:pca_sweep} shows 2D PCA projections of residual stream activations for three representative configurations. For Mess3, the belief simplex is clearly visible in PC0--PC1 from early layers onward. For Fern, the geometry is discernible but occupies a smaller fraction of total activation variance. For Leopard, the belief structure is not visible in the top-2 principal components.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[t]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/pca_2d_mess3_a0.6_x0.15_midterm_report.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/pca_2d_fern_x0.63_midterm_report.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/pca_2d_leopard_x0.15_midterm_report.png}
+  \end{minipage}
+  \caption{2D PCA of residual stream activations across all 28 layers, colored by ground-truth belief state (RGB = $(b^{(1)}, b^{(2)}, b^{(3)})$). Left: Mess3 ($\alpha{=}0.6$, $x{=}0.15$) shows clear simplex geometry. Center: Fern ($x{=}0.63$) shows discernible but less crisp structure. Right: Leopard ($x{=}0.15$) shows no visible belief-state geometry in the top-2 PCA components.}
+  \label{fig:pca_sweep}
+\end{figure}
+
+\paragraph{Tuned lens sweep.}
+Figure~\ref{fig:tuned_lens_sweep} shows the layer-by-layer relationship between KL(HMM $\|$ HMM-target tuned lens) and belief-state probe $R^2$ across all 8 configurations. For Mess3 and Fern, the HMM-target tuned lens achieves near-zero KL ($< 0.001$) at the same early layers (3--7) where $R^2$ peaks, confirming that a simple affine transformation suffices to extract the belief state at these layers. The model-target tuned lens, by contrast, shows monotonically decreasing KL(model $\|$ tuned\_model) from layer 0 to 27, reflecting progressive convergence toward the final output distribution.
+
+The cross-target comparison---KL(HMM $\|$ tuned\_model)---remains roughly constant across layers ($\sim$0.01--0.02), indicating that the model's internal predictions maintain a consistent gap from the HMM ground truth regardless of layer depth. This gap is process-dependent and correlates with the $R^2$ pattern: smaller for Mess3 and Fern, larger for Leopard.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{figures/layer_kl_hmm_tuned_hmm_vs_r2_midterm_report.png}
+  \caption{Layer vs.\ KL(HMM $\|$ HMM-target tuned lens) vs.\ $R^2$ for all 8 HMM configurations. Black line (left axis): belief-state probe $R^2$. Colored dashed line (right axis): KL divergence. Mess3 and Fern achieve near-zero KL at the early layers where $R^2$ peaks; Leopard shows persistently higher KL.}
+  \label{fig:tuned_lens_sweep}
+\end{figure}
 
 \subsection{Causal use of belief states}
 
@@ -268,7 +337,13 @@ These steering results were obtained with the same decoders used in the patching
 \end{figure}
 
 \paragraph{Tuned lens.}
-The tuned lens reveals a sharp improvement in per-layer predictions beginning around layers 13--14, after which KL divergence to the Bayesian-optimal distribution drops substantially. Strikingly, this improvement occurs precisely in the layers where linear probe $R^2$ is \emph{lower} than its early-layer peak (Figure~\ref{fig:r2_per_layer}). Early layers (2--4), where linear probes achieve their highest $R^2$, do not yield correspondingly better tuned lens decoding. This dissociation suggests that the quality of the linear belief-state encoding is not the primary determinant of whether a layer's activations are sufficient to recover the correct output distribution. One interpretation is that later layers contain mechanisms that transform belief-relevant information into a format more directly decodable to output probabilities, even if the explicit linear belief-state geometry is no longer as clean.
+The model-target tuned lens reveals a sharp improvement in per-layer predictions beginning around layers 13--14, after which KL divergence to the Bayesian-optimal distribution drops substantially. Strikingly, this improvement occurs precisely in the layers where linear probe $R^2$ is \emph{lower} than its early-layer peak (Figure~\ref{fig:r2_per_layer}). Early layers (2--4), where linear probes achieve their highest $R^2$, do not yield correspondingly better model-target tuned lens decoding. This dissociation suggests that the quality of the linear belief-state encoding is not the primary determinant of whether a layer's activations are sufficient to recover the correct output distribution.
+
+However, the \emph{HMM-target} tuned lens tells a complementary story: when the translator is trained to decode toward the HMM's observation probabilities rather than the model's own output, KL(HMM $\|$ tuned\_hmm) is minimized at precisely the early layers (3--7) where probe $R^2$ peaks. This confirms that the belief state is most faithfully encoded at early layers; the model-target tuned lens's late-layer improvement instead reflects the accumulation of output-formatting computation that is orthogonal to the belief geometry. The later-layer computation analysis (Section~\ref{sec:later_layer}) corroborates this interpretation.
+
+\paragraph{Later-layer computation.}
+\label{sec:later_layer}
+Decomposing activations into belief-aligned and orthogonal components reveals that belief-state variance decreases monotonically from $\sim$1--4\% at layer 0 to $\sim$0.1--0.2\% at layer 27, while orthogonal variance grows correspondingly. Yet decoders trained on the \emph{full} activation vector improve with depth ($R^2$: 0.955 at layer 0 $\to$ 0.984 at layer 27), while decoders restricted to the belief subspace remain poor ($R^2 \approx 0.2$). This means later layers encode prediction-relevant information \emph{orthogonal} to the belief subspace---performing output formatting and logit refinement rather than improving the belief representation itself. This ``compute early, format late'' pattern is consistent across Mess3 and Fern configurations.
 
 \subsection{Construction of belief states}
 
@@ -279,13 +354,13 @@ The tuned lens reveals a sharp improvement in per-layer predictions beginning ar
 % ============================================================================
 \section{Challenges \& Open Questions}
 
-\textit{TODO (Chirag): write a paragraph summarizing whether the Fern results resolve the ambiguity between genuine latent-state tracking and linear encoding of the output distribution.}
+The Fern results substantially resolve the ambiguity between genuine latent-state tracking and linear encoding of the output distribution. Fern's emission matrix maps three hidden states to two output tokens without a left inverse, so the output distribution does not uniquely determine the belief state. Despite this, linear probes recover the full 3D belief state with $R^2 > 0.97$, and the HMM-target tuned lens achieves KL $< 0.0001$ at early layers. This rules out the hypothesis that the model merely compresses its output probabilities, and provides strong evidence that Llama-3.2-3B tracks genuine latent structure when processing HMM-generated sequences.
 
-A related question is whether the representations found are specific to the HMM structure of Mess3, or whether they would generalize to other HMMs and other models. The belief state sweep experiments vary HMM parameters, but we have not yet run systematic comparisons across a wide range of processes.
+The belief-state sweep across Mess3, Fern, and Leopard reveals that the model's ability to encode belief states varies substantially by process. Mess3 and Fern achieve near-perfect encoding ($R^2 > 0.97$), while Leopard is poorly captured ($R^2 \approx 0.33$--$0.57$). Understanding what structural properties of the HMM determine encoding quality---transition matrix sparsity, mixing time, emission geometry---remains an open question.
 
 On the causal side, the patching experiments demonstrate that activations carry belief state information, but the decoder fidelity analysis reveals that the decoders used to construct the intervention are systematically less accurate for belief states corresponding to unlikely tokens. Because Mess3 concentrates probability mass on one token per state, the natural training distribution under-represents rare emissions, introducing a confound into any comparison that aggregates across token probabilities. Until this is addressed, intervention results for unlikely-token beliefs should be interpreted with caution.
 
-Computationally, all experiments so far use Mess3 with fixed parameters. Running parameter sweeps across a wider range of HMM configurations requires additional compute and a larger set of curated results. \textit{TODO (Chirag): mention any Fern-specific challenges or open issues here if applicable.}
+Computationally, the belief-state sweep across 8 HMM configurations has been completed, revealing a clear hierarchy of encoding quality: Mess3 $>$ Fern $\gg$ Leopard. A Fern-specific challenge is that the 2-token vocabulary produces higher ``junk mass'' (probability assigned to non-HMM tokens) than the 3-token Mess3 vocabulary, which can inflate KL divergence metrics. Additionally, Leopard's poor encoding quality ($R^2 \approx 0.33$--$0.57$) raises the question of whether the model genuinely fails to track the Leopard belief state, or whether the belief state is encoded in a non-linear or higher-dimensional subspace not captured by our linear probes.
 
 A further open question concerns an apparent tension between the tuned lens results and the probe and intervention results. The belief-state geometry is cleanest in early layers: linear probes peak at layers 2--4, cross-sequence consistency is highest there, and the belief-state representation emerges before the model's output distribution has converged. Yet tuned lens decoding performs \emph{worst} at precisely these early layers and only achieves low KL divergence after a sharp improvement around layers 13--14. The causal experiments echo this pattern: activation patching and steering are most effective at late layers (roughly 14+), where the linear belief-state encoding is weaker. This is counter-intuitive: the layers where the belief geometry is most linearly decodable are the layers where it is hardest to find a map from that geometry to the output probabilities, whereas the layers where the geometry is dirtier are the layers where causal interventions and tuned lens decoding are most effective. Several hypotheses could explain this: (a) the linear belief-state representation is progressively transformed by later attention and MLP layers into a format optimized for output generation rather than linear readout, (b) later layers contain information about the sequence that is relevant to prediction but not captured by the belief-state geometry, or (c) the degradation of the linear encoding in later layers is compensated by other computational mechanisms. Ablation experiments---projecting out the linear belief-state subspace at various layers and measuring the downstream effect on tuned lens performance---would help distinguish these hypotheses.
 
@@ -294,7 +369,7 @@ A further open question concerns an apparent tension between the tuned lens resu
 % ============================================================================
 \section{Next Steps}
 
-\textit{TODO (Chirag): write a paragraph on the current state of the Fern results and what remains to be done (e.g., extending the intervention pipeline to Fern, additional processes).}
+The belief-state sweep and tuned lens sweep experiments are complete across 8 HMM configurations (4 Mess3, 2 Fern, 2 Leopard). The key finding is that belief-state encoding quality varies substantially by process, with Mess3 and Fern achieving near-perfect linear decodability ($R^2 > 0.97$) while Leopard is poorly captured ($R^2 \approx 0.33$--$0.57$). The Fern results are particularly important: they demonstrate genuine latent-state tracking (not just output compression) by showing that the model encodes a 3D belief state from a 1D output distribution. The tuned lens sweep confirms that the optimal decoding window is at early layers (3--7) across all well-encoded processes, and that later layers perform output formatting rather than belief refinement. Remaining work includes extending the activation patching and steering pipeline to Fern and Leopard to test whether the causal findings from Mess3 generalize, and investigating whether non-linear probes can recover the Leopard belief state that linear probes miss.
 
 For the causal interventions, the most immediate priority is to retrain the decoders on a dataset of activations that is balanced with respect to token probability. Because Mess3 concentrates most emissions on a single likely token per state, the natural distribution of training activations under-represents rare emissions, leading to higher decoder reconstruction error for unlikely-token beliefs. By subsampling token positions to equalize the representation of likely and unlikely emissions, we aim to flatten the decoder MSE across the probability range and thereby remove the confound from all downstream patching and steering experiments. Additionally, the steering experiments are partially complete but need further analysis and comparison across layers and $k$ values.
 
