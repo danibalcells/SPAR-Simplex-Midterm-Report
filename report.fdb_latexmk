@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex report"] 1775249322 "report.aux" "report.bbl" "report" 1775249326
+["bibtex report"] 1775249322 "report.aux" "report.bbl" "report" 1775251754
   "/usr/local/texlive/2022/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
   "references.bib" 1775245082 7406 f84ad8c42b02c414437b93d575eb3ee6 ""
-  "report.aux" 1775249326 20477 6c4ba420a7c201c8dd82958bd27259a5 "pdflatex"
+  "report.aux" 1775251754 20477 6c4ba420a7c201c8dd82958bd27259a5 "pdflatex"
   (generated)
   "report.bbl"
   "report.blg"
-["pdflatex"] 1775249322 "/Users/chiragrastogi/Dev/research/comp_mechanics/SPAR/spar_26_midterm_report/report.tex" "report.pdf" "report" 1775249326
-  "/Users/chiragrastogi/Dev/research/comp_mechanics/SPAR/spar_26_midterm_report/report.tex" 1775245201 60392 fc4ae6825ac40c31162e5f6be9b2ad28 ""
+["pdflatex"] 1775251749 "/Users/chiragrastogi/Dev/research/comp_mechanics/SPAR/spar_26_midterm_report/report.tex" "report.pdf" "report" 1775251754
+  "/Users/chiragrastogi/Dev/research/comp_mechanics/SPAR/spar_26_midterm_report/report.tex" 1775251749 60396 be3dc3bb6f4a52b2e8e7587a4d43980e ""
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -168,10 +168,10 @@
   "figures/r2_per_layer.png" 1775068409 41496 f344e48b699b820afc628c62d2286f84 ""
   "figures/simplex_layer_10.png" 1775068409 60836 3cf49b9cb6486ba23498573919fcbe8f ""
   "figures/steering_kl_vs_layer.png" 1775068409 250333 8672f5bec8c6b77e5b3ad3f89b55560e ""
-  "report.aux" 1775249326 20477 6c4ba420a7c201c8dd82958bd27259a5 "pdflatex"
+  "report.aux" 1775251754 20477 6c4ba420a7c201c8dd82958bd27259a5 "pdflatex"
   "report.bbl" 1775249322 1092 a799fe3a648d8f6335d421b468dc4bbf "bibtex report"
-  "report.out" 1775249326 3207 3e3694f6689ce2324389b0faa7c32fac "pdflatex"
-  "report.tex" 1775245201 60392 fc4ae6825ac40c31162e5f6be9b2ad28 ""
+  "report.out" 1775251754 3207 3e3694f6689ce2324389b0faa7c32fac "pdflatex"
+  "report.tex" 1775251749 60396 be3dc3bb6f4a52b2e8e7587a4d43980e ""
   "sparreport.cls" 1775068409 8431 4ffca6a3107d7518cb73cae9b62a1257 ""
   (generated)
   "report.aux"
