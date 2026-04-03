@@ -1,2 +1,109 @@
 \relax 
-\gdef \@abspage@last{1}
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{shai2024}
+\citation{shai2024}
+\citation{park2025}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\citation{llama32}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Methodology}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Experimental setup}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}In-context HMM prediction}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Interfacing HMM tokens with the LLM.}{2}{section*.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Bayesian-optimal belief states pooled across ten 5{,}000-token Mess3 sequences, plotted on the 2-simplex. Each point is one belief state $\mathbf  {b}_t$, colored by its value (RGB = $(b_t^{(1)}, b_t^{(2)}, b_t^{(3)})$). The three clusters near the vertices reflect periods of high certainty about the hidden state; the self-similar branching structure between them is characteristic of the fractal belief geometry induced by the HMM.}}{3}{figure.1}\protected@file@percent }
+\newlabel{fig:optimal_belief_simplex}{{1}{3}{Bayesian-optimal belief states pooled across ten 5{,}000-token Mess3 sequences, plotted on the 2-simplex. Each point is one belief state $\mathbf {b}_t$, colored by its value (RGB = $(b_t^{(1)}, b_t^{(2)}, b_t^{(3)})$). The three clusters near the vertices reflect periods of high certainty about the hidden state; the self-similar branching structure between them is characteristic of the fractal belief geometry induced by the HMM}{figure.1}{}}
+\newlabel{fig:optimal_belief_simplex@cref}{{[figure][1][]1}{[1][2][]3}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{KL divergence and junk mass.}{3}{section*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Convergence criterion.}{3}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Linear decodability of belief states}{3}{subsection.2.3}\protected@file@percent }
+\newlabel{sec:linear_decodability}{{2.3}{3}{Linear decodability of belief states}{subsection.2.3}{}}
+\newlabel{sec:linear_decodability@cref}{{[subsection][3][2]2.3}{[1][3][]3}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Mess3.}{3}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Cross-sequence consistency.}{4}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Fern and Leopard.}{4}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Belief-state sweep.}{4}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Emergence.}{4}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Causal use of belief states}{4}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Activation patching.}{4}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Activation steering.}{5}{section*.10}\protected@file@percent }
+\citation{tunedlens}
+\@writefile{toc}{\contentsline {paragraph}{Tuned lens.}{6}{section*.11}\protected@file@percent }
+\newlabel{sec:later_layer_method}{{2.4}{6}{Later-layer computation}{section*.12}{}}
+\newlabel{sec:later_layer_method@cref}{{[subsection][4][2]2.4}{[1][6][]6}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Later-layer computation.}{6}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Construction of belief states}{6}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Preliminary Results}{7}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}In-context HMM prediction}{7}{subsection.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces KL divergence between the model's renormalized output distribution and the Bayesian-optimal distribution over the first 100 tokens of a Mess3 sequence. The dashed line indicates the convergence threshold (2\% of maximum KL). The model consistently reaches this threshold by around 20--30 tokens.}}{7}{figure.2}\protected@file@percent }
+\newlabel{fig:kl_over_sequence}{{2}{7}{KL divergence between the model's renormalized output distribution and the Bayesian-optimal distribution over the first 100 tokens of a Mess3 sequence. The dashed line indicates the convergence threshold (2\% of maximum KL). The model consistently reaches this threshold by around 20--30 tokens}{figure.2}{}}
+\newlabel{fig:kl_over_sequence@cref}{{[figure][2][]2}{[1][7][]7}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Linear decodability of belief states}{7}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Probe performance.}{7}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Cross-sequence consistency.}{7}{section*.14}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces $R^2$ of the pooled linear probe evaluated on held-out sequences, by layer. Shading indicates one standard deviation across held-out sequences. Performance peaks in early-to-mid layers and is lower at the embedding layer (0) and at the final layers.}}{8}{figure.3}\protected@file@percent }
+\newlabel{fig:r2_per_layer}{{3}{8}{$R^2$ of the pooled linear probe evaluated on held-out sequences, by layer. Shading indicates one standard deviation across held-out sequences. Performance peaks in early-to-mid layers and is lower at the embedding layer (0) and at the final layers}{figure.3}{}}
+\newlabel{fig:r2_per_layer@cref}{{[figure][3][]3}{[1][7][]8}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Pairwise similarity between per-sequence probes at selected layers. Cosine similarity and $\theta _1$ measure directional agreement between probe weight matrices; cross-MSE ratio measures the MSE penalty of applying one sequence's probe to another's activations.}}{8}{table.1}\protected@file@percent }
+\newlabel{tab:cross_seq}{{1}{8}{Pairwise similarity between per-sequence probes at selected layers. Cosine similarity and $\theta _1$ measure directional agreement between probe weight matrices; cross-MSE ratio measures the MSE penalty of applying one sequence's probe to another's activations}{table.1}{}}
+\newlabel{tab:cross_seq@cref}{{[table][1][]1}{[1][8][]8}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Emergence.}{8}{section*.15}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Mean lag (token position at which probe $R^2 > 0.9$ minus token position at which model KL converges) by layer. Negative values indicate that the probe threshold is reached before the model's output distribution converges. Error bars show one standard deviation across sequences.}}{9}{figure.4}\protected@file@percent }
+\newlabel{fig:lag_summary}{{4}{9}{Mean lag (token position at which probe $R^2 > 0.9$ minus token position at which model KL converges) by layer. Negative values indicate that the probe threshold is reached before the model's output distribution converges. Error bars show one standard deviation across sequences}{figure.4}{}}
+\newlabel{fig:lag_summary@cref}{{[figure][4][]4}{[1][8][]9}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Belief geometry.}{9}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Fern, Leopard, and belief-state sweep.}{9}{section*.17}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Peak belief-state probe $R^2$ across HMM configurations, with the layer at which the minimum KL(HMM $\|$ HMM-target tuned lens) is achieved.}}{9}{table.2}\protected@file@percent }
+\newlabel{tab:sweep_r2}{{2}{9}{Peak belief-state probe $R^2$ across HMM configurations, with the layer at which the minimum KL(HMM $\|$ HMM-target tuned lens) is achieved}{table.2}{}}
+\newlabel{tab:sweep_r2@cref}{{[table][2][]2}{[1][9][]9}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Belief state geometry at layer 10 as recovered by the encoder-decoder. Each point represents the belief state at one token position, colored by the true hidden state. The distribution follows the expected shape of the Mess3 stationary distribution on the simplex.}}{10}{figure.5}\protected@file@percent }
+\newlabel{fig:simplex}{{5}{10}{Belief state geometry at layer 10 as recovered by the encoder-decoder. Each point represents the belief state at one token position, colored by the true hidden state. The distribution follows the expected shape of the Mess3 stationary distribution on the simplex}{figure.5}{}}
+\newlabel{fig:simplex@cref}{{[figure][5][]5}{[1][9][]10}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces 2D PCA of residual stream activations across all 28 layers, colored by ground-truth belief state (RGB = $(b^{(1)}, b^{(2)}, b^{(3)})$). Left: Mess3 ($\alpha {=}0.6$, $x{=}0.15$) shows clear simplex geometry. Center: Fern ($x{=}0.63$) shows discernible but less crisp structure. Right: Leopard ($x{=}0.15$) shows no visible belief-state geometry in the top-2 PCA components.}}{10}{figure.6}\protected@file@percent }
+\newlabel{fig:pca_sweep}{{6}{10}{2D PCA of residual stream activations across all 28 layers, colored by ground-truth belief state (RGB = $(b^{(1)}, b^{(2)}, b^{(3)})$). Left: Mess3 ($\alpha {=}0.6$, $x{=}0.15$) shows clear simplex geometry. Center: Fern ($x{=}0.63$) shows discernible but less crisp structure. Right: Leopard ($x{=}0.15$) shows no visible belief-state geometry in the top-2 PCA components}{figure.6}{}}
+\newlabel{fig:pca_sweep@cref}{{[figure][6][]6}{[1][10][]10}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Tuned lens sweep.}{11}{section*.18}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Layer vs.\ KL(HMM $\|$ HMM-target tuned lens) vs.\ $R^2$ for all 8 HMM configurations. Black line (left axis): belief-state probe $R^2$. Colored dashed line (right axis): KL divergence. Mess3 and Fern achieve near-zero KL at the early layers where $R^2$ peaks; Leopard shows persistently higher KL.}}{11}{figure.7}\protected@file@percent }
+\newlabel{fig:tuned_lens_sweep}{{7}{11}{Layer vs.\ KL(HMM $\|$ HMM-target tuned lens) vs.\ $R^2$ for all 8 HMM configurations. Black line (left axis): belief-state probe $R^2$. Colored dashed line (right axis): KL divergence. Mess3 and Fern achieve near-zero KL at the early layers where $R^2$ peaks; Leopard shows persistently higher KL}{figure.7}{}}
+\newlabel{fig:tuned_lens_sweep@cref}{{[figure][7][]7}{[1][11][]11}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Causal use of belief states}{11}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Activation patching.}{11}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Factual--counterfactual discrepancy and token probability.}{11}{section*.20}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Crossing plot for activation patching. The $y$-axis shows mean KL divergence to the factual (blue) and counterfactual (orange) Bayesian-optimal distributions, as a function of the layer at which patching is applied. The crossover point indicates the layer at which the patched activations carry sufficient belief state information to shift the model's predictions toward the counterfactual.}}{12}{figure.8}\protected@file@percent }
+\newlabel{fig:crossing}{{8}{12}{Crossing plot for activation patching. The $y$-axis shows mean KL divergence to the factual (blue) and counterfactual (orange) Bayesian-optimal distributions, as a function of the layer at which patching is applied. The crossover point indicates the layer at which the patched activations carry sufficient belief state information to shift the model's predictions toward the counterfactual}{figure.8}{}}
+\newlabel{fig:crossing@cref}{{[figure][8][]8}{[1][11][]12}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Decoder fidelity.}{12}{section*.21}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Activation patching KL vs.\ layer, split by token probability. Left: factual patches; right: counterfactual patches. In both panels, likely-token beliefs (blue) yield lower KL than unlikely-token beliefs (orange). The two panels are nearly identical, confirming that the factual--counterfactual distinction is not the relevant factor; token probability is.}}{13}{figure.9}\protected@file@percent }
+\newlabel{fig:patching_token_prob}{{9}{13}{Activation patching KL vs.\ layer, split by token probability. Left: factual patches; right: counterfactual patches. In both panels, likely-token beliefs (blue) yield lower KL than unlikely-token beliefs (orange). The two panels are nearly identical, confirming that the factual--counterfactual distinction is not the relevant factor; token probability is}{figure.9}{}}
+\newlabel{fig:patching_token_prob@cref}{{[figure][9][]9}{[1][12][]13}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Balanced-decoder patching.}{13}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Activation steering.}{13}{section*.23}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Normalized decoder MSE ($\lVert \mathbf  {a}_t - D(\mathbf  {b}_t) \rVert ^2 / \lVert \mathbf  {a}_t \rVert ^2$) vs.\ token probability $p_t$ at each layer. Each blue dot is one (sequence, position) pair; the red line shows the binned mean. At early-to-mid layers, low-probability tokens exhibit markedly higher reconstruction error, explaining why patching with beliefs corresponding to unlikely tokens yields worse results.}}{14}{figure.10}\protected@file@percent }
+\newlabel{fig:decoder_fidelity}{{10}{14}{Normalized decoder MSE ($\lVert \mathbf {a}_t - D(\mathbf {b}_t) \rVert ^2 / \lVert \mathbf {a}_t \rVert ^2$) vs.\ token probability $p_t$ at each layer. Each blue dot is one (sequence, position) pair; the red line shows the binned mean. At early-to-mid layers, low-probability tokens exhibit markedly higher reconstruction error, explaining why patching with beliefs corresponding to unlikely tokens yields worse results}{figure.10}{}}
+\newlabel{fig:decoder_fidelity@cref}{{[figure][10][]10}{[1][13][]14}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Tuned lens.}{14}{section*.24}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Activation steering: KL divergence to the target belief state as a function of intervention layer, for past-consistent conditions at each $K$ (top two rows) and control conditions (bottom). Solid lines show the shared-prefix variant; dashed lines show the different-prefix variant. The black dashed line indicates the unsteered baseline KL (to the factual belief). At late layers, all conditions converge to near-baseline KL, indicating successful belief injection.}}{15}{figure.11}\protected@file@percent }
+\newlabel{fig:steering_kl}{{11}{15}{Activation steering: KL divergence to the target belief state as a function of intervention layer, for past-consistent conditions at each $K$ (top two rows) and control conditions (bottom). Solid lines show the shared-prefix variant; dashed lines show the different-prefix variant. The black dashed line indicates the unsteered baseline KL (to the factual belief). At late layers, all conditions converge to near-baseline KL, indicating successful belief injection}{figure.11}{}}
+\newlabel{fig:steering_kl@cref}{{[figure][11][]11}{[1][14][]15}{}{}{}}
+\newlabel{sec:later_layer}{{3.3}{16}{Later-layer computation}{section*.25}{}}
+\newlabel{sec:later_layer@cref}{{[subsection][3][3]3.3}{[1][16][]16}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Later-layer computation.}{16}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Construction of belief states}{16}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{16}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Prediction quality}{16}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Belief-state representation}{16}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Belief-state construction}{17}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Belief-to-output routing}{18}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Synthesis}{19}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Next Steps}{19}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Belief-state construction.}{19}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Output routing.}{19}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Representation geometry.}{19}{section*.28}\protected@file@percent }
+\bibstyle{plain}
+\bibdata{references}
+\bibcite{tunedlens}{1}
+\bibcite{llama32}{2}
+\bibcite{park2025}{3}
+\bibcite{shai2024}{4}
+\@writefile{toc}{\contentsline {paragraph}{Scale.}{20}{section*.29}\protected@file@percent }
+\gdef \@abspage@last{20}
