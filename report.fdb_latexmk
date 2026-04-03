@@ -1,14 +1,13 @@
 # Fdb version 4
-["bibtex report"] 1775189667.73328 "report.aux" "report.bbl" "report" 1775189828.55379 0
+["bibtex report"] 1775191289.22185 "report.aux" "report.bbl" "report" 1775191293.76377 0
   "./references.bib" 1775184255.10201 7406 f84ad8c42b02c414437b93d575eb3ee6 ""
   "/usr/local/texlive/2026/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "report.aux" 1775189828.29282 17875 44de6f227dfda63e2ff934676a79be9f "pdflatex"
+  "report.aux" 1775191293.48901 18277 a73f24869cf3c0617953f4e1286053e5 "pdflatex"
   (generated)
   "report.bbl"
   "report.blg"
   (rewritten before read)
-["pdflatex"] 1775189823.96572 "/Users/dani/code/SPAR-Simplex-Midterm-Report/report.tex" "report.pdf" "report" 1775189828.55397 0
-  "/Users/dani/code/SPAR-Simplex-Midterm-Report/report.tex" 1775189822.70466 59637 c833c0b582bce296650dec1f4ee3d00c ""
+["pdflatex"] 1775191289.3237 "report.tex" "report.pdf" "report" 1775191293.76403 0
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -151,7 +150,7 @@
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
   "figures/crossing_plot.png" 1774553801.91854 246042 b906fe7034fe9ae0c006384f2596951a ""
   "figures/decoder_fidelity.png" 1774563966.75587 567234 4d05b2f7d2012276a2bcff23b0c02cca ""
-  "figures/kl_over_sequence.png" 1774553801.91065 52762 ffe9bf8877b65e5ee328c8776afe48a5 ""
+  "figures/kl_over_sequence.png" 1775191266.68116 94243 bdee821cd06e73749965f40f18c15332 ""
   "figures/lag_summary.png" 1774553801.91477 36051 03219b972cfd798999cb00011ad4e2af ""
   "figures/layer_kl_hmm_tuned_hmm_vs_r2_midterm_report.png" 1775170629.81599 591027 5a78eff780518db2f93c217c3c72afe6 ""
   "figures/optimal_belief_simplex.png" 1774560166.8297 163145 c458c049fc45322bf76782433c921437 ""
@@ -162,10 +161,10 @@
   "figures/r2_per_layer.png" 1774553801.91272 41496 f344e48b699b820afc628c62d2286f84 ""
   "figures/simplex_layer_10.png" 1774553801.91656 60836 3cf49b9cb6486ba23498573919fcbe8f ""
   "figures/steering_kl_vs_layer.png" 1774564030.86271 250333 8672f5bec8c6b77e5b3ad3f89b55560e ""
-  "report.aux" 1775189828.29282 17875 44de6f227dfda63e2ff934676a79be9f "pdflatex"
-  "report.bbl" 1775189667.81921 1084 a60c09b72ec34e98a9653de2c8b2aeaa "bibtex report"
-  "report.out" 1775189828.29405 3207 3e3694f6689ce2324389b0faa7c32fac "pdflatex"
-  "report.tex" 1775189822.70466 59637 c833c0b582bce296650dec1f4ee3d00c ""
+  "report.aux" 1775191293.48901 18277 a73f24869cf3c0617953f4e1286053e5 "pdflatex"
+  "report.bbl" 1775191289.32159 1092 a799fe3a648d8f6335d421b468dc4bbf "bibtex report"
+  "report.out" 1775191293.49024 3207 3e3694f6689ce2324389b0faa7c32fac "pdflatex"
+  "report.tex" 1775191277.05535 59746 0a7e9ab02a13b89af0721f18aa72e468 ""
   "sparreport.cls" 1774541682.8969 8431 4ffca6a3107d7518cb73cae9b62a1257 ""
   (generated)
   "report.aux"
