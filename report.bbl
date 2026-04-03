@@ -1,8 +1,7 @@
 \begin{thebibliography}{1}
 
 \bibitem{tunedlens}
-Nora Belrose, Igor Ostrovsky, Lev McKinney, Zach Furman, Logan Smith, Danny
-  Halawi, Stella Biderman, and Jacob Steinhardt.
+Nora Belrose, Igor Ostrovsky, Lev McKinney, Zach Furman, Logan Smith, Danny Halawi, Stella Biderman, and Jacob Steinhardt.
 \newblock Eliciting latent predictions from transformers with the tuned lens.
 \newblock {\em arXiv preprint arXiv:2303.08112}, 2023.
 
@@ -12,16 +11,18 @@ Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, et~al.
 \newblock {\em arXiv preprint arXiv:2407.21783}, 2024.
 
 \bibitem{park2025}
-Core~Francisco Park, Andrew Lee, Ekdeep~Singh Lubana, Yongyi Yang, Maya Okawa,
-  Kento Nishi, Martin Wattenberg, and Hidenori Tanaka.
+Core~Francisco Park, Andrew Lee, Ekdeep~Singh Lubana, Yongyi Yang, Maya Okawa, Kento Nishi, Martin Wattenberg, and Hidenori Tanaka.
 \newblock {ICLR}: In-context learning of representations.
 \newblock In {\em International Conference on Learning Representations}, 2025.
 
+\bibitem{piotrowski2025constrained}
+Mateusz Piotrowski, Paul~M Riechers, Daniel Filan, and Adam~S Shai.
+\newblock Constrained belief updates explain geometric structures in transformer representations.
+\newblock {\em arXiv preprint arXiv:2502.01954}, 2025.
+
 \bibitem{shai2024}
-Adam~S. Shai, Sarah~E. Marzen, Lucas Teixeira, Alexander {Gietelink Oldenziel},
-  and Paul~M. Riechers.
-\newblock Transformers represent belief state geometry in their residual
-  stream.
+Adam~S. Shai, Sarah~E. Marzen, Lucas Teixeira, Alexander {Gietelink Oldenziel}, and Paul~M. Riechers.
+\newblock Transformers represent belief state geometry in their residual stream.
 \newblock In {\em Advances in Neural Information Processing Systems}, 2024.
 
 \end{thebibliography}
