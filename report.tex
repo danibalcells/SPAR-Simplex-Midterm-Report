@@ -10,8 +10,8 @@
 
 \author{%
   \begin{tabular}{@{}c@{\hspace{3em}}c@{\hspace{3em}}c@{\hspace{3em}}c@{}}
-    \textbf{Dani Balcells} & \textbf{Chirag Rastogi} & \textbf{Andrew Lee} & \textbf{Xavier Poncini} \\
-    \texttt{dani@example.com} & \texttt{chirag@example.com} & \texttt{andrew@example.com} & \texttt{xavier@example.com} \\[0.2em]
+    \textbf{Dani Balcells} & \textbf{Chirag Rastogi} & \textbf{Andrew Jun Lee}& \textbf{Xavier Poncini} \\
+    \texttt{dani@example.com} & \texttt{chirag@example.com} & \texttt{andrewlee0@g.ucla.edu}& \texttt{xavier@example.com} \\[0.2em]
     \small\textit{SPAR Mentee} & \small\textit{SPAR Mentee} & \small\textit{SPAR Mentee} & \small\textit{Supervisor} \\
     & & & \small\textit{Simplex}
   \end{tabular}%
@@ -150,8 +150,59 @@ To characterize what information later layers encode beyond the belief state, we
 We then train Ridge regression decoders ($\alpha = 1$) from three input representations to multiple targets (concept logits, HMM next-token distribution, belief entropy): (i)~belief coordinates $\mathbf{h} Q \in \mathbb{R}^{n_{\mathrm{states}}}$, (ii)~PCA of $\mathbf{h}_{\mathrm{orth}}$ with $n_{\mathrm{states}}$ components (dimensionality-matched to the belief subspace as a control), and (iii)~their concatenation. All decoders share the same 80/20 train-test split as the probe, and we report test $R^2$.
 
 \subsection{Construction of belief states}
+\subsubsection{Motivation and focus on layer 0}
+The preceding sections provided evidence that belief states are linearly present in the residual stream and causally relevant to the model's output. A natural next question is how the model constructs these representations from the input. Piotrowski et al.~\cite{piotrowski2025constrained} recently proposed a theory of \emph{constrained belief updating} that answers this question for single-layer transformers trained on Mess3. According to this theory, the attention mechanism implements a parallelized approximation to Bayesian inference, producing a characteristic intermediate geometry, called the \textit{constrained belief geometry}, that the MLP then refines into the full belief state. We test whether the same mechanism operates in Llama's first attention layer (layer 0). We focus on this layer because probing reveals, as we will show, that the belief geometry already emerges there. Specifically, in layer 0, the residual stream activations transition from three token-identity clusters at \texttt{resid\_pre} to a full belief geometry at \texttt{resid\_post} (post-attention, post-MLP).
 
-\textit{TODO: Andrew add constrained belief update}
+\subsubsection{HMM parameters}
+For the constrained belief experiments, we use the Mess3 parameters from Piotrowski et al. \cite{piotrowski2025constrained}: $\alpha = 0.6$, $x = 0.15$. This gives an eigenvalue $\zeta = 1 - 3x = 0.55$ of the transition matrix. Using this parameterization, the constrained and full Bayesian belief geometries are visually distinct: the constrained belief geometry exhibits a straight Sierpinski-like fractal edges, while the full Bayesian geometry has curved edges. We generate a single 2000-token sequence and discard the first 250 positions as burn-in, since the probe results above suggest that the model learns the geometry at or past 250 tokens.
+
+\subsubsection{Theoretical predictions}
+\label{sec:constrained_theory}
+Piotrowski et al.\ show that in a single-layer transformer, the attention mechanism decomposes the constrained belief update (their Eq.~5) into per-source contributions. Each source position~$s$ contributes a correction to the belief at destination position~$d$ of the form $\zeta^{d-s} \cdot \mathbf{d}_{z_s}$, where $\mathbf{d}_{z_s} = \boldsymbol{\pi} T^{|z_s} - \boldsymbol{\pi}$ is a direction in belief space determined by the source token (one of three possible directions), and $\zeta^{d-s}$ is a scalar that decays exponentially with token distance. This leads to four testable predictions about the residual stream at each stage:
+\begin{enumerate}
+\item \textbf{Token embeddings} (\texttt{resid\_pre}) should map linearly to $\boldsymbol{\pi} T^{|z_d} - \boldsymbol{\pi}$: the current token's belief-space direction (Eqs.~14--15).
+\item \textbf{Attention output} (\texttt{attn\_out}) should map linearly to $\sum_{s < d} \zeta^{d-s} \cdot \mathbf{d}_{z_s}$: the exponentially-weighted sum of past token directions (from Eq.~5).
+\item \textbf{Post-attention activations} (\texttt{resid\_mid}) should map to the constrained belief state (Eq.~5): $\boldsymbol{\pi} + \sum_{s=1}^{d} \zeta^{d-s} \cdot \mathbf{d}_{z_s}$.
+\item \textbf{Post-MLP activations} (\texttt{resid\_post}) should map to the full Bayesian belief state (Eq.~2).
+\end{enumerate}
+
+ \subsubsection{Effective weight for multi-head attention}
+\label{sec:effective_weight}
+Prediction~2 states that \texttt{attn\_out} should map to $\sum_{s < d} \zeta^{d-s} \cdot \mathbf{d}_{z_s}$. Probing tests whether this holds for the total sum. But the sum also makes a stronger prediction. It is composed of one term per past token $s$, each decaying as $\zeta^{d-s}$ with distance, where $\zeta$ is predetermined by the HMM parameters. This means that the impact of a token on the belief state should decrease exponentially the further back the token is from the current position. Accordingly, contributions based on token distance in \texttt{attn\_out} should scale by $\zeta$. 
+
+In a single-head transformer, each per-source contribution is a scalar attention weight $A(d,s)$ times an OV vector, and since the OV vector depends only on the source token (not on distance), the distance dependence is proportional to $A(d,s)$. One can plot $A(d,s)$ by distance and observe exponential decay (Piotrowski et al., Figure~2C). With 24 heads, this is no longer possible because, for each (destination, source) pair there are 24 scalar weights, each paired with a different OV circuit, and there is no single number to plot. We derive what we call an \textit{effective weight} that collapses these into one scalar per (destination, source) pair.
+ 
+The total contribution from source token~$s$ to destination token~$d$ across all heads is
+\begin{equation}
+\text{contribution}(d, s) = \sum_{h=1}^{24} A_h(d,s) \cdot \mathbf{v}_h(s) \quad \in \mathbb{R}^{3072}\,,
+\end{equation}
+where $A_h(d,s)$ is the attention weight and $\mathbf{v}_h(s) = W_O^{(h)} W_V^{(h)} \mathbf{x}_s$ is the OV vector of head~$h$ at position~$s$. The theory predicts that, projected into belief space via a linear map~$W$, this should equal $\zeta^{d-s} \cdot \mathbf{d}_{z_s}$:
+\begin{equation}
+\text{contribution}(d,s) \cdot W = c \cdot \mathbf{d}_{z_s}\,,
+\label{eq:effective_weight_setup}
+\end{equation}
+where $c = \zeta^{d-s}$ is the unknown scalar. Taking the dot product of both sides with $\mathbf{d}_{z_s}$:
+\begin{equation}
+\big(\text{contribution}(d,s) \cdot W\big) \cdot \mathbf{d}_{z_s} = c \cdot \|\mathbf{d}_{z_s}\|^2\,,
+\end{equation}
+and solving gives what we call the \emph{effective weight}:
+\begin{equation}
+c = \frac{\big(\text{contribution}(d,s) \cdot W\big) \cdot \mathbf{d}_{z_s}}{\|\mathbf{d}_{z_s}\|^2}\,.
+\label{eq:effective_weight}
+\end{equation}
+This scalar measures how much source~$s$ pushed the belief at destination~$d$ along the direction predicted by the theory. The dot product discards any component perpendicular to $\mathbf{d}_{z_s}$.
+
+The map $W$ is the only unknown in this equation. Estimating it is non-trivial. Here, we estimate it using linear probes, and show converging results using two types of probes. \textbf{Probe~A} (attn\_out $\to$ expected attention output) provides the most targeted projection, but its target contains $\zeta^k$ explicitly. This raises a circularity concern: if $W$ was trained to find a subspace where the total matches a $\zeta^k$-weighted sum, could good matches to $\zeta$ simply emerge from this fact? \textbf{Probe~B} (attn\_out $\to$ full Bayesian beliefs) mitigates this, since its target is computed by the full Bayesian update with no $\zeta$ in the formula.
+
+Both of our probes are learned without a bias term. This is because each per-source contribution should map to $\zeta^{d-s} \cdot \mathbf{d}_{z_s}$, which goes to zero as $d - s \to \infty$, and a map with a bias $b$ would send negligible contributions to $b$ rather than zero. Empirically, adding a bias improves $R^2$ by only 0.0006.
+ 
+\subsubsection{Probe-free validation}
+\label{sec:probefree}
+Any learned projection $W$ selects 3 directions out of 3072 and could in principle reveal spurious patterns along those directions. To verify the decay without any learned map, we use two methods on the raw $\mathbb{R}^{3072}$ attention output vectors:
+ 
+\paragraph{PCA and coloring.} We apply PCA to attn\_out across all post-burn-in positions and color each point by the identity of the token at lag~$k$, for $k = 0, 1, 2, \ldots$ If the attention output encodes token history in a hierarchically nested structure, coloring by $t{-}1$ should separate the major clusters, coloring by $t{-}2$ should separate sub-clusters, and so on.
+ 
+\paragraph{Between-group variance.} For each lag~$k$, we group all attn\_out vectors by the token at $t{-}k$ and compute the between-group variance (the fraction of total variance attributable to the lag-$k$ token identity). If the effective weighting of past tokens decays as $\zeta^k$, the between-group variance should decay as $\zeta^{2k}$ (since variance scales with squared displacement). We fit a log-linear model to lags $k = 1$ through $k = 6$ and extract the implied~$\zeta$.
 
 % ============================================================================
 % PRELIMINARY RESULTS
@@ -352,9 +403,9 @@ The control conditions confirm the specificity of the intervention. Garbage-vali
 
 These steering results were obtained with the same decoders used in the patching experiments, before the decoder fidelity issue described above was identified. The elevated KL at middle layers (roughly 6--17) may therefore reflect the same decoder bias toward likely-token beliefs rather than a genuine limitation of the steering intervention. Whether this mid-layer KL gap persists once decoders are retrained on a probability-balanced dataset remains to be tested.
 
-\begin{figure}[htbp]
+\begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{figures/steering_kl_vs_layer.png}
+  \includegraphics[width=0.95\textwidth]{figures/steering_kl_vs_layer.png}
   \caption{Activation steering: KL divergence to the target belief state as a function of intervention layer, for past-consistent conditions at each $K$ (top two rows) and control conditions (bottom). Solid lines show the shared-prefix variant; dashed lines show the different-prefix variant. The black dashed line indicates the unsteered baseline KL (to the factual belief). At late layers, all conditions converge to near-baseline KL, indicating successful belief injection.}
   \label{fig:steering_kl}
 \end{figure}
@@ -369,8 +420,57 @@ However, the \emph{HMM-target} tuned lens tells a complementary story: when the 
 Decomposing activations into belief-aligned and orthogonal components reveals that belief-state variance decreases monotonically from $\sim$1--4\% at layer 0 to $\sim$0.1--0.2\% at layer 27, while orthogonal variance grows correspondingly. Yet decoders trained on the \emph{full} activation vector improve with depth ($R^2$: 0.955 at layer 0 $\to$ 0.984 at layer 27), while decoders restricted to the belief subspace remain poor ($R^2 \approx 0.2$). This means later layers encode prediction-relevant information \emph{orthogonal} to the belief subspace---performing output formatting and logit refinement rather than improving the belief representation itself. This ``compute early, format late'' pattern is consistent across Mess3 and Fern configurations.
 
 \subsection{Construction of belief states}
+\subsubsection{Probing the four stages}
+Linear probes trained on each stage's activations achieve high $R^2$ on held-out data when predicting their matched theoretical targets: \texttt{resid\_pre} $\to$ expected embedding ($R^2 = 1.000$), \texttt{attn\_out} $\to$ expected attention output ($R^2 = 0.996$), \texttt{resid\_mid} $\to$ constrained belief ($R^2 = 0.999$), and \texttt{resid\_post} $\to$ full Bayesian belief ($R^2 = 0.999$). Figure~\ref{fig:four_stage_regression} visualizes the probed belief states projected onto the simplex at each stage. A $4 \times 4$ cross-regression matrix (Figure~\ref{fig:pairwise_r2_matrix}) suggests that each stage preferentially encodes its matched target.
+ 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/four_stage_regression.pdf}
+  \caption{Probed belief states at each residual stream stage, projected onto the 2-simplex. Each point is one sequence position (test set), colored by current token identity. From left to right: token embeddings map to three discrete directions; the attention output maps to the exponentially-weighted sum of past directions; post-attention maps to the constrained belief; post-MLP maps to the full Bayesian belief.}
+  \label{fig:four_stage_regression}
+\end{figure}
+ 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/pairwise_r2_matrix.pdf}
+  \caption{$4 \times 4$ cross-regression matrix. Each entry shows the $R^2$ of a linear probe trained to predict the column's theoretical target from the row's activations. Diagonal entries (boxed) are highest in each row, confirming that each stage preferentially encodes its matched target.}
+  \label{fig:pairwise_r2_matrix}
+\end{figure}
+ 
+\subsubsection{Fractal hierarchy in the attention output}
+PCA of the layer-0 attention output reveals a hierarchical cluster structure consistent with the constrained belief update (Figure~\ref{fig:fractal_hierarchy}). Coloring each point by the previous token ($t{-}1$) cleanly separates three major groups; coloring by $t{-}2$ separates nine sub-groups within these; coloring by the current token ($t{-}0$) shows no separation. This is the Sierpinski-like hierarchy predicted to exist in the attention output: the most recent token determines the coarsest structure, each earlier token adds a finer level of subdivision, and the current token, which has not yet been integrated by the attention mechanism, is absent from the geometry.
 
-\textit{Andrew to add.}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fractal_hierarchy.pdf}
+  \caption{PCA of layer-0 attention output, colored by the token at different lags. At $t{-}1$, three major groups separate. At $t{-}2$, nine sub-clusters emerge. At $t{-}0$ (current token), no separation is visible. This matches the prediction of the constrained belief update.}
+  \label{fig:fractal_hierarchy}
+\end{figure}
+ 
+\subsubsection{Exponential decay of past token influence}
+We measure how quickly the influence of past tokens decays in the attention output using three methods (Figure~\ref{fig:decay_combined}, Table~\ref{tab:decay_summary}). The between-group variance is consistent across PCA subspaces (panel~a): the implied $\zeta$ is similar whether computed on the full 3072-d vectors, the top 2, 5, or 10 PCA dimensions, confirming that the decay structure is concentrated in the leading principal components rather than spread across all dimensions. Fitting the full-space variance at lags $k = 1$--$6$ (panel~b) yields $\zeta = 0.585$ ($R^2 = 0.947$), after which the signal falls below a noise floor. The effective weight (Eq.~\ref{eq:effective_weight}) extends the measurable range by projecting into the 3-d belief subspace. With Probe~A (panel~c), the decay is visible out to $k \approx 9$, yielding $\zeta = 0.568$ ($R^2 = 0.989$). With Probe~B (panel~d), whose target contains no $\zeta$, the result is $\zeta = 0.530$ ($R^2 = 0.922$). All methods give $\zeta \approx 0.53$--$0.59$, compared to the theoretical value of $0.55$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/decay_combined.pdf}
+  \caption{Exponential decay of past token influence. (a)~Between-group variance of attn\_out grouped by the token at lag~$k$, computed on the full 3072-d vectors and on PCA subspaces of 2, 5, and 10 dimensions; the implied $\zeta$ is consistent across subspaces, confirming the decay structure is concentrated in the leading principal components. (b)~Effective weight (Eq.~\ref{eq:effective_weight}) using Probe~A (attn\_out $\to$ expected attention output). (c)~Effective weight using Probe~B (attn\_out $\to$ full Bayesian beliefs, whose target contains no~$\zeta$). Red: fit to $k = 1$--$6$. Dashed: theoretical $\zeta = 0.55$.}
+  \label{fig:decay_combined}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \caption{Implied decay rate across three measurement methods. Theoretical $\zeta = 0.55$.}
+  \label{tab:decay_summary}
+  \begin{tabular}{lcc}
+    \hline
+    Method & Effective Weight or Predicted $\zeta$& Fit $R^2$ \\
+    \hline
+    Between-group variance (no probe) & 0.585 & 0.947 \\
+    Effective weight (Probe A: attn\_out $\to$ expected attn) & 0.568 & 0.989 \\
+    Effective weight (Probe B: attn\_out $\to$ full beliefs) & 0.530 & 0.922 \\
+    \hline
+  \end{tabular}
+\end{table}
 
 % ============================================================================
 % DISCUSSION
